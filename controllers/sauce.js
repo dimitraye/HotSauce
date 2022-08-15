@@ -1,30 +1,38 @@
+
+
 const Sauce = require('../models/sauce');
 const fs = require('fs');
 const { table } = require('console');
 
+
+//Fonction pour créer une sauce
 exports.createSauce = (req, res, next) => {
   console.log('req.body', req.body);
   console.log('req.body.sauce', req.body.sauce);
+  //Transforme l'objet sauce au format JSON en objet utilisable
   const sauceObject = JSON.parse(req.body.sauce);
+  //supprime l'id de sauce lors de sa création car la base de donnée va lui en attribuer un automatiquement 
   delete sauceObject._id;
   delete sauceObject._userId;
   const sauce = new Sauce({
     ...sauceObject,
     userId: req.auth.userId,
     imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
+    //initialise les likes/ dislikes à 0 et usersLiked/usersDisliked vides comme demandé dans les spécs
     likes: 0,
     dislikes: 0,
     usersLiked: [],
     usersDisliked: []
   });
 
+  //Enregistre la saucedans la base de donnés 
   sauce.save()
     .then(() => { res.status(201).json({ message: 'Objet enregistré !' }) })
     .catch(error => { res.status(400).json({ error }) })
 };
 
 
-
+//Affiche une seule sauce(détails de la sauce)
 exports.getOneSauce = (req, res, next) => {
   Sauce.findOne({
     _id: req.params.id
@@ -41,12 +49,17 @@ exports.getOneSauce = (req, res, next) => {
   );
 };
 
+//Met à jour un sauce
 exports.modifySauce = (req, res, next) => {
+  //créer un objet Sauce
+  //si le fichier existe déjà, attribuer tous les éléments JSON à sauceObject
+  //Sinon 
   const sauceObject = req.file ? {
     ...JSON.parse(req.body.sauce),
     imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
   } : { ...req.body };
 
+  //
   delete sauceObject._userId;
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => {
@@ -63,8 +76,10 @@ exports.modifySauce = (req, res, next) => {
     });
 };
 
+//Met à jour le nombre de likes/dislikes
 exports.modifyLike = (req, res, next) => {
   const userId = req.body.userId;
+  //transforme like au forat Json en format Int
   const like = parseInt(req.body.like);
   const id = req.params.id;
   let newSauce;
@@ -82,6 +97,7 @@ exports.modifyLike = (req, res, next) => {
     });
 };
 
+//Supprime une sauce
 exports.deleteSauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id })
     .then(sauce => {
@@ -101,6 +117,7 @@ exports.deleteSauce = (req, res, next) => {
     });
 };
 
+//Affiche toutes les sauces
 exports.getAllSauces = (req, res, next) => {
   Sauce.find().then(
     (sauces) => {
@@ -115,7 +132,7 @@ exports.getAllSauces = (req, res, next) => {
   );
 };
 
-
+//fonction qui like/dislike une sauce
 function likeDislike(userId, like, sauce) {
   let newSauce = {};
   newSauce._id = sauce._id;

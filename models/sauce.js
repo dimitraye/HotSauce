@@ -1,6 +1,9 @@
+/* MODELS */
+/* Gère les données et la logique métier */
+
 const mongoose = require('mongoose');
 
-
+//Schém d'une sauce
 const sauceSchema = mongoose.Schema({
     userId: { type: String },
     name: { type: String },
