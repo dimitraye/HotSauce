@@ -1,5 +1,6 @@
 const Sauce = require('../models/sauce');
 const fs = require('fs');
+const { table } = require('console');
 
 exports.createSauce = (req, res, next) => {
   console.log('req.body', req.body);
@@ -64,18 +65,17 @@ exports.modifySauce = (req, res, next) => {
 
 exports.modifyLike = (req, res, next) => {
   const userId = req.body.userId;
-  const like = req.body.like;
+  const like = parseInt(req.body.like);
   const id = req.params.id;
-  delete likeInfo.userId;
-  Sauce.findOne({ _id: req.params.id })
+  let newSauce;
+  Sauce.findOne({ _id: id })
     .then((sauce) => {
-      if (sauce.userId != req.auth.userId) {
-        res.status(401).json({ message: 'Not authorized' });
-      } else {
-        Sauce.updateOne({ _id: req.params.id }, { likes: likeInfo.like })
-          .then(() => res.status(200).json({ message: 'Objet modifié!' }))
-          .catch(error => res.status(401).json({ error }));
-      }
+
+      newSauce = likeDislike(userId, like, sauce);
+      Sauce.updateOne({ _id: id }, { ...newSauce })
+        .then(() => res.status(200).json({ message: 'Objet modifié!' }))
+        .catch(error => res.status(401).json({ error }));
+
     })
     .catch((error) => {
       res.status(400).json({ error });
@@ -117,6 +117,8 @@ exports.getAllSauces = (req, res, next) => {
 
 
 function likeDislike(userId, like, sauce) {
+  let newSauce = {};
+  newSauce._id = sauce._id;
   //si like == 1
   if (like == 1) {
     //verifier si mon unserId sse trouve dans le tableau des usersLiked
@@ -125,6 +127,7 @@ function likeDislike(userId, like, sauce) {
       sauce.usersLiked.push(userId);
       // incrémenter sauce.likes de 1
       sauce.likes += 1;
+      newSauce = {likes: sauce.likes, usersLiked: sauce.usersLiked };
     }
   }
   else if (like == -1) {
@@ -134,26 +137,36 @@ function likeDislike(userId, like, sauce) {
       sauce.usersDisliked.push(userId);
       // incrémenter sauce.likes de 1
       sauce.dislikes += 1;
+      newSauce = {  dislikes: sauce.dislikes, usersDisliked: sauce.usersDisliked };
     }
+
   }
 
-  else if(like == 0){
-     // Parcourrur les tableau -> supprimer le UserId + décrémenter liki/dislke de 1 
-     //vérifie si le userId est dans usersLikded
-     if(sauce.usersLiked.includes("userId")){
+  else if (like == 0) {
+    // Parcourrur les tableau -> supprimer le UserId + décrémenter liki/dislke de 1 
+    //vérifie si le userId est dans usersLikded
+    if (sauce.usersLiked.includes(userId)) {
       //supprimer userId du tableau
-      sauce.usersLiked = sauce.usersLiked.filter(idUser => idUser !=  userId);
+
+      sauce.usersLiked = sauce.usersLiked.filter(idUser => idUser != userId);
+
       //decrementer sauce.likes de 1
-      sauce.likes -=1;
-     }
-     else if(sauce.usersDisliked.includes("userId")){
+      sauce.likes -= 1;
+      newSauce = {  likes: sauce.likes, usersLiked: sauce.usersLiked };
+
+    }
+    else if (sauce.usersDisliked.includes(userId)) {
       //supprimer userId du tableau
-      sauce.usersDisliked = sauce.usersDisliked.filter(idUser => idUser !=  userId);
+      sauce.usersDisliked = sauce.usersDisliked.filter(idUser => idUser != userId);
       //decrementer sauce.likes de 1
-      sauce.dislikes -=1;
-     }
- 
+      sauce.dislikes -= 1;
+      newSauce = { dislikes: sauce.dislikes, usersDisliked: sauce.usersDisliked };
+
+    }
+
   }
-  //Si like ==0
-   
+  return newSauce;
+
+
 }
+
