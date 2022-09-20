@@ -3,6 +3,13 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 //Module servant à vérifier la validité d'un email
 const emailvalidator = require("email-validator");
+//Module servant à vérifier la validité d'un mot de passe
+var passwordValidator = require('password-validator');
+
+// Create a schema
+var schema = new passwordValidator();
+schema
+.is().min(5);    // Minimum length 5
 
 //Création d'un utilisateur
 exports.signup = (req, res, next) => { 
@@ -10,6 +17,10 @@ exports.signup = (req, res, next) => {
   if ((!req.body.email || !emailvalidator.validate(req.body.email))){
     res.status(400).send({error:"Email ou Mot de Passe Invalide"});
     throw "Erreur : Email ou Mot de Passe Invalide";
+  }
+  if ((!req.body.password || !schema.validate(req.body.password))){
+    res.status(400).send({error:"Merci d'indiquer un mot de passe de minimum 5 caractères"});
+    throw "Erreur : Mot de passe de moins de 5 caractères";
   }
   bcrypt
     .hash(req.body.password, 10)
