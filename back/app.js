@@ -1,6 +1,9 @@
 const express = require('express');
 
+
 const app = express();
+
+require("dotenv").config();
 
 const mongoose = require('mongoose');
 
@@ -10,8 +13,9 @@ const userRoutes = require('./routes/user');
 
 const path = require('path');
 
+
 //Connexion à la base de donnée 
-mongoose.connect('mongodb+srv://Dimitri:xeKyPhV3TtCF2WY@cluster0.5ujafkx.mongodb.net/?retryWrites=true&w=majority',
+mongoose.connect('mongodb+srv://'+process.env.DB_USER+':'+process.env.DB_PASSWORD+'@cluster0.5ujafkx.mongodb.net/?retryWrites=true&w=majority',
     {
         useNewUrlParser: true,
         useUnifiedTopology: true

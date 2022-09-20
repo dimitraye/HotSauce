@@ -2,8 +2,7 @@
 
 const Sauce = require('../models/sauce');
 const fs = require('fs');
-const { table } = require('console');
-
+const SAUCE_INTROUVABLE = "sauce introuvable";
 
 //Fonction pour créer une sauce
 exports.createSauce = (req, res, next) => {
@@ -28,7 +27,7 @@ exports.createSauce = (req, res, next) => {
   //Enregistre la saucedans la base de donnés 
   sauce.save()
     .then(() => { res.status(201).json({ message: 'Objet enregistré !' }) })
-    .catch(error => { res.status(400).json({ error }) })
+    .catch(error => { res.status(400).json({ error : "Impossible d'enregistrer la sauce" }) })
 };
 
 
@@ -43,7 +42,7 @@ exports.getOneSauce = (req, res, next) => {
   ).catch(
     (error) => {
       res.status(404).json({
-        error: error
+        error: SAUCE_INTROUVABLE
       });
     }
   );
@@ -68,11 +67,11 @@ exports.modifySauce = (req, res, next) => {
       } else {
         Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
           .then(() => res.status(200).json({ message: 'Objet modifié!' }))
-          .catch(error => res.status(401).json({ error }));
+          .catch(error => res.status(401).json({ error : "Impossible de mettre à jour la sauce" }));
       }
     })
     .catch((error) => {
-      res.status(400).json({ error });
+      res.status(400).json({ error : SAUCE_INTROUVABLE });
     });
 };
 
@@ -89,11 +88,11 @@ exports.modifyLike = (req, res, next) => {
       newSauce = likeDislike(userId, like, sauce);
       Sauce.updateOne({ _id: id }, { ...newSauce })
         .then(() => res.status(200).json({ message: 'Objet modifié!' }))
-        .catch(error => res.status(401).json({ error }));
+        .catch(error => res.status(401).json({ error : "Impossible de modifier la sauce" }));
 
     })
     .catch((error) => {
-      res.status(400).json({ error });
+      res.status(400).json({ error : SAUCE_INTROUVABLE });
     });
 };
 
@@ -108,12 +107,12 @@ exports.deleteSauce = (req, res, next) => {
         fs.unlink(`images/${filename}`, () => {
           Sauce.deleteOne({ _id: req.params.id })
             .then(() => { res.status(200).json({ message: 'Objet supprimé !' }) })
-            .catch(error => res.status(401).json({ error }));
+            .catch(error => res.status(401).json({ error : "Impossible de supprimer la sauce" }));
         });
       }
     })
     .catch(error => {
-      res.status(500).json({ error });
+      res.status(500).json({ error : SAUCE_INTROUVABLE });
     });
 };
 
@@ -126,7 +125,7 @@ exports.getAllSauces = (req, res, next) => {
   ).catch(
     (error) => {
       res.status(400).json({
-        error: error
+        error: "Impossible de récupérer les sauces"
       });
     }
   );
