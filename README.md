@@ -6,6 +6,11 @@ This is the front end and back end server for Project 6 of the Web Developer pat
 
 You will need to have Node and `npm` installed locally on your machine.
 You need to create a folder called `ìmages` inside the back folder
+You need to create a file named ".env" inside the back folder that contains the database user info. For exemple :
+    Replace XXX by the database user Id and user Password :
+        DB_USER=XXX
+        DB_PASSWORD=XXX
+        
 
 ### Back end Installation ###
 
