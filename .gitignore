@@ -1,6 +1,5 @@
 back/node_modules
-node_modules
 back/images
-.env
+back/.env
 package-lock.json
 package.json
