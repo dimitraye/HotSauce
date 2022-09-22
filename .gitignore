@@ -1,3 +1,6 @@
 back/node_modules
+node_modules
 back/images
 .env
+package-lock.json
+package.json

@@ -1,5 +1,3 @@
-
-
 const Sauce = require('../models/sauce');
 const fs = require('fs');
 const SAUCE_INTROUVABLE = "sauce introuvable";
@@ -29,7 +27,6 @@ exports.createSauce = (req, res, next) => {
     .then(() => { res.status(201).json({ message: 'Objet enregistré !' }) })
     .catch(error => { res.status(400).json({ error : "Impossible d'enregistrer la sauce" }) })
 };
-
 
 //Affiche une seule sauce(détails de la sauce)
 exports.getOneSauce = (req, res, next) => {
