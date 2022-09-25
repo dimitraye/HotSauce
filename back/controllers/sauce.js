@@ -124,11 +124,17 @@ exports.deleteSauce = (req, res, next) => {
         //Renvoie une réponse dont le status est 401 et dont le message est au format JSON
         res.status(401).json({ message: 'Not authorized' });
       } else {
+          
           /* Sépare la chaîne de caractères en deux parties : 1-la première partie contient l'url jusqu'à /images/ comprit 
             2-la deuxième partie après /images/ (soit le nom de l'image)
-          */        
+            EXEMPLE : 
+            http://localhost:3000/images/media.auchan.1664106546363.jpg
+            =
+            [ "http://localhost:3000/images/" , "media.auchan.1664106546363.jpg"]
+          */      
+
          const filename = sauce.imageUrl.split('/images/')[1];
-        //Enlève le lien qui mène à l'image
+        //Supprime l'image du dossier image
         fs.unlink(`images/${filename}`, () => {
           //Efface une sauce en fonction de son id
           Sauce.deleteOne({ _id: req.params.id })
