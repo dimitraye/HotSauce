@@ -1,10 +1,11 @@
-/* MODELS */
-/* Gère les données et la logique métier */
+/* Modélisation de la sauce */
 
+//Importe le package mongoose qui facilite les intéractions avec MongoDB
 const mongoose = require('mongoose');
 
-//Schém d'une sauce
+//Schéma d'une sauce
 const sauceSchema = mongoose.Schema({
+    //Propriétés de la sauce
     userId: { type: String },
     name: { type: String },
     manufacturer: { type: String },
@@ -19,4 +20,5 @@ const sauceSchema = mongoose.Schema({
     usersDisliked: { type: [String] }
   });
 
+//Rend le modèle accessible dans d'autres fichiers
 module.exports = mongoose.model('Sauce', sauceSchema);
